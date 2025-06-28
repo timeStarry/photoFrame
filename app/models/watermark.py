@@ -2,6 +2,7 @@ from sqlmodel import SQLModel, Field
 from typing import Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
+from .base import BaseModel
 
 class FrameType(str, Enum):
     WHITE_FRAME = "white_frame"
@@ -33,11 +34,8 @@ class WatermarkTemplateBase(SQLModel):
     logo_path: Optional[str] = Field(default=None)
     is_public: bool = Field(default=False)
 
-class WatermarkTemplate(WatermarkTemplateBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class WatermarkTemplate(WatermarkTemplateBase, BaseModel, table=True):
     user_id: int = Field(foreign_key="user.id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = Field(default=None)
 
 class WatermarkTemplateCreate(WatermarkTemplateBase):
     user_id: int
@@ -45,7 +43,8 @@ class WatermarkTemplateCreate(WatermarkTemplateBase):
 class WatermarkTemplateRead(WatermarkTemplateBase):
     id: int
     user_id: int
-    created_at: datetime
+    create_time: datetime
+    update_time: Optional[datetime] = None
 
 class WatermarkTemplateUpdate(SQLModel):
     name: Optional[str] = None
