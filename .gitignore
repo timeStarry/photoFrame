@@ -1,5 +1,32 @@
 .idea/
 .vscode/
 
-outputs
-uploads
+# 输出目录
+outputs/
+uploads/
+temp/
+
+# 数据库文件
+*.db
+*.db-journal
+*.backup.db
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 虚拟环境
+venv/
+.venv/
+env/
+.env
+
+# 日志文件
+*.log
+
+# 操作系统文件
+.DS_Store
+Thumbs.db

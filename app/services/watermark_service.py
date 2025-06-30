@@ -44,25 +44,39 @@ class WatermarkService:
         image_size: Tuple[int, int],
         text_size: Tuple[int, int],
         position: PositionType,
-        margin_x: int,
-        margin_y: int
+        margin_x_percent: float,
+        margin_y_percent: float
     ) -> Tuple[int, int]:
-        """计算水印位置"""
+        """计算水印位置 - 支持九宫格定位和百分比边距"""
         img_width, img_height = image_size
         text_width, text_height = text_size
         
+        # 将百分比转换为像素值
+        margin_x = int(img_width * margin_x_percent / 100)
+        margin_y = int(img_height * margin_y_percent / 100)
+        
+        # 九宫格位置计算
         if position == PositionType.TOP_LEFT:
             return (margin_x, margin_y)
+        elif position == PositionType.TOP_CENTER:
+            return ((img_width - text_width) // 2, margin_y)
         elif position == PositionType.TOP_RIGHT:
             return (img_width - text_width - margin_x, margin_y)
+        elif position == PositionType.MIDDLE_LEFT:
+            return (margin_x, (img_height - text_height) // 2)
+        elif position == PositionType.MIDDLE_CENTER:
+            return ((img_width - text_width) // 2, (img_height - text_height) // 2)
+        elif position == PositionType.MIDDLE_RIGHT:
+            return (img_width - text_width - margin_x, (img_height - text_height) // 2)
         elif position == PositionType.BOTTOM_LEFT:
             return (margin_x, img_height - text_height - margin_y)
+        elif position == PositionType.BOTTOM_CENTER:
+            return ((img_width - text_width) // 2, img_height - text_height - margin_y)
         elif position == PositionType.BOTTOM_RIGHT:
             return (img_width - text_width - margin_x, img_height - text_height - margin_y)
-        elif position == PositionType.CENTER:
-            return ((img_width - text_width) // 2, (img_height - text_height) // 2)
         else:
-            return (margin_x, img_height - text_height - margin_y)
+            # 默认右下角
+            return (img_width - text_width - margin_x, img_height - text_height - margin_y)
     
     @staticmethod
     def apply_frame(image: PILImage.Image, frame_type: FrameType) -> PILImage.Image:
@@ -150,8 +164,8 @@ class WatermarkService:
             image.size, 
             (text_width, text_height),
             template.position,
-            template.margin_x,
-            template.margin_y
+            template.margin_x_percent,
+            template.margin_y_percent
         )
         
         # 解析颜色
@@ -186,8 +200,8 @@ class WatermarkService:
                 image.size,
                 logo.size,
                 template.position,
-                template.margin_x,
-                template.margin_y
+                template.margin_x_percent,
+                template.margin_y_percent
             )
             
             # 调整透明度
@@ -288,8 +302,8 @@ class WatermarkService:
                 "font_color": "#000000",
                 "position": PositionType.BOTTOM_RIGHT,
                 "opacity": 0.8,
-                "margin_x": 20,
-                "margin_y": 20,
+                "margin_x_percent": 2.0,
+                "margin_y_percent": 2.0,
                 "is_public": False
             },
             {
@@ -301,8 +315,34 @@ class WatermarkService:
                 "font_color": "#FFFFFF",
                 "position": PositionType.BOTTOM_LEFT,
                 "opacity": 0.9,
-                "margin_x": 30,
-                "margin_y": 30,
+                "margin_x_percent": 3.0,
+                "margin_y_percent": 3.0,
+                "is_public": False
+            },
+            {
+                "name": "居中版权",
+                "watermark_type": "copyright",
+                "frame_type": FrameType.WHITE_FRAME,
+                "font_family": "default",
+                "font_size": 18,
+                "font_color": "#666666",
+                "position": PositionType.MIDDLE_CENTER,
+                "opacity": 0.5,
+                "margin_x_percent": 0.0,
+                "margin_y_percent": 0.0,
+                "is_public": False
+            },
+            {
+                "name": "顶部居中标题",
+                "watermark_type": "artistic",
+                "frame_type": FrameType.DEPTH_COLOR_CARD,
+                "font_family": "default",
+                "font_size": 28,
+                "font_color": "#FFFFFF",
+                "position": PositionType.TOP_CENTER,
+                "opacity": 0.9,
+                "margin_x_percent": 0.0,
+                "margin_y_percent": 1.5,
                 "is_public": False
             }
         ]

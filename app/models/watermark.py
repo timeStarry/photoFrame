@@ -13,25 +13,30 @@ class WatermarkType(str, Enum):
     COPYRIGHT = "copyright"
 
 class PositionType(str, Enum):
-    TOP_LEFT = "top_left"
-    TOP_RIGHT = "top_right"
-    BOTTOM_LEFT = "bottom_left"
-    BOTTOM_RIGHT = "bottom_right"
-    CENTER = "center"
+    """九宫格位置定义"""
+    TOP_LEFT = "top_left"           # 左上
+    TOP_CENTER = "top_center"       # 正上
+    TOP_RIGHT = "top_right"         # 右上
+    MIDDLE_LEFT = "middle_left"     # 左中
+    MIDDLE_CENTER = "middle_center" # 正中
+    MIDDLE_RIGHT = "middle_right"   # 右中
+    BOTTOM_LEFT = "bottom_left"     # 左下
+    BOTTOM_CENTER = "bottom_center" # 正下
+    BOTTOM_RIGHT = "bottom_right"   # 右下
 
 class WatermarkTemplateBase(SQLModel):
     name: str
     watermark_type: WatermarkType
     frame_type: FrameType
     font_family: str
-    font_size: int = Field(default=24)
-    font_color: str = Field(default="#FFFFFF")
-    position: PositionType = Field(default=PositionType.BOTTOM_RIGHT)
-    opacity: float = Field(default=0.8, ge=0.0, le=1.0)
-    margin_x: int = Field(default=20)
-    margin_y: int = Field(default=20)
-    logo_path: Optional[str] = Field(default=None)
-    is_public: bool = Field(default=False)
+    font_size: int = Field(default=24, description="字体大小(像素)")
+    font_color: str = Field(default="#FFFFFF", description="字体颜色")
+    position: PositionType = Field(default=PositionType.BOTTOM_RIGHT, description="水印位置(九宫格)")
+    opacity: float = Field(default=0.8, ge=0.0, le=1.0, description="透明度(0-1)")
+    margin_x_percent: float = Field(default=2.0, ge=0.0, le=50.0, description="水平边距(图片宽度百分比)")
+    margin_y_percent: float = Field(default=2.0, ge=0.0, le=50.0, description="垂直边距(图片高度百分比)")
+    logo_path: Optional[str] = Field(default=None, description="Logo图片路径")
+    is_public: bool = Field(default=False, description="是否为公共模板")
 
 class WatermarkTemplate(WatermarkTemplateBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -54,8 +59,8 @@ class WatermarkTemplateUpdate(SQLModel):
     font_color: Optional[str] = None
     position: Optional[PositionType] = None
     opacity: Optional[float] = None
-    margin_x: Optional[int] = None
-    margin_y: Optional[int] = None
+    margin_x_percent: Optional[float] = Field(default=None, ge=0.0, le=50.0)
+    margin_y_percent: Optional[float] = Field(default=None, ge=0.0, le=50.0)
     logo_path: Optional[str] = None
     is_public: Optional[bool] = None
 
